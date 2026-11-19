@@ -87,9 +87,9 @@ export class EmployeeService {
     ]);
 
     // Flatten the current salary into the response
-    const data = employees.map((emp) => ({
+    const data = employees.map((emp: any) => ({
       ...emp,
-      currentSalary: emp.salaries[0] || null,
+      currentSalary: emp.salaries?.[0] || null,
       salaries: undefined,
     }));
 
@@ -124,7 +124,7 @@ export class EmployeeService {
 
     return {
       ...employee,
-      currentSalary: employee.salaries.find((s) => s.endDate === null) || null,
+      currentSalary: employee.salaries.find((s: any) => s.endDate === null) || null,
     };
   }
 
@@ -188,7 +188,7 @@ export class EmployeeService {
   /**
    * Update an employee's details.
    */
-  async update(id: number, data: Prisma.EmployeeUpdateInput) {
+  async update(id: number, data: any) {
     // Check existence
     const existing = await prisma.employee.findUnique({ where: { id } });
     if (!existing) {
