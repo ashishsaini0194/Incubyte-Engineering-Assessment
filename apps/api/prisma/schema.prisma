@@ -1,0 +1,66 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Department {
+  id        Int        @id @default(autoincrement())
+  name      String     @unique
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  employees Employee[]
+}
+
+model Employee {
+  id            Int       @id @default(autoincrement())
+  employeeCode  String    @unique
+  firstName     String
+  lastName      String
+  email         String    @unique
+  phone         String?
+  dateOfBirth   DateTime
+  dateOfJoining DateTime
+  gender        String    // MALE, FEMALE, OTHER
+  status        String    @default("ACTIVE") // ACTIVE, INACTIVE, TERMINATED
+  departmentId  Int
+  designation   String
+  country       String
+  city          String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  department Department @relation(fields: [departmentId], references: [id])
+  salaries   Salary[]
+
+  @@index([departmentId])
+  @@index([country])
+  @@index([status])
+  @@index([firstName, lastName])
+}
+
+model Salary {
+  id            Int       @id @default(autoincrement())
+  employeeId    Int
+  baseSalary    Float
+  bonus         Float     @default(0)
+  deductions    Float     @default(0)
+  netSalary     Float
+  currency      String
+  effectiveDate DateTime
+  endDate       DateTime?
+  notes         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  employee Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  @@index([employeeId])
+  @@index([effectiveDate])
+}
