@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: api-build
+    working_dir: /app/apps/api
+    command: >
+      sh -c "npx prisma migrate deploy &&
+             npx tsx prisma/seed.ts &&
+             npx tsx src/index.ts"
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=file:./dev.db
+      - PORT=3000
+      - NODE_ENV=production
+    volumes:
+      - db-data:/app/apps/api/prisma
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: web-build
+    working_dir: /app/apps/web
+    command: npx serve dist -l 5173 -s
+    ports:
+      - "5173:5173"
+    depends_on:
+      - api
+
+volumes:
+  db-data:
